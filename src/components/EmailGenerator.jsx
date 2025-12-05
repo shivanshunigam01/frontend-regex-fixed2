@@ -11,6 +11,15 @@ const CARD_TITLES = [
   "6. Subject Line Options",
 ];
 
+function stripHTML(html) {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    .replace(/\n{3,}/g, "\n\n") // prevent too many blank lines
+    .trim();
+}
+
 function processOutput(raw) {
   const regex = /(###\s*([^*\n]+)|\*\*(.*?)\*\*)\s*\n([\s\S]*?)(?=###|\*\*|$)/g;
 
@@ -115,38 +124,68 @@ export default function EmailGenerator() {
 
       {/* OUTPUT CARDS */}
       {showCards && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          {CARD_TITLES.map((title) => (
-            <div
-              key={title}
-              className="bg-white rounded-xl p-5 shadow-lg border flex flex-col"
-            >
-              {/* Card Title + Copy Button */}
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="font-semibold text-lg">{title}</h2>
+        <>
+          {/* SUBJECT LINES FULL-WIDTH HORIZONTAL CARD */}
+          <div className="bg-white rounded-xl p-5 shadow-lg border mt-8">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="font-semibold text-lg">6. Subject Line Options</h2>
 
-                <button
-                  disabled={loading}
-                  onClick={() => copyText(output[title] || "")}
-                  className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-40"
-                >
-                  Copy
-                </button>
-              </div>
-
-              {/* CONTENT AREA */}
-              <div className="flex-1 max-h-[250px] overflow-auto whitespace-pre-line text-sm leading-relaxed">
-                {loading ? (
-                  <div className="flex justify-center items-center h-full py-6">
-                    <span className="animate-spin h-6 w-6 border-2 border-gray-400 border-t-transparent rounded-full"></span>
-                  </div>
-                ) : (
-                  output[title]
-                )}
-              </div>
+              <button
+                disabled={loading}
+                onClick={() =>
+                  copyText(output["6. Subject Line Options"] || "")
+                }
+                className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-40"
+              >
+                Copy
+              </button>
             </div>
-          ))}
-        </div>
+
+            <div className="max-h-[200px] overflow-auto whitespace-pre-line text-sm leading-relaxed">
+              {loading ? (
+                <div className="flex justify-center items-center h-full py-6">
+                  <span className="animate-spin h-6 w-6 border-2 border-gray-400 border-t-transparent rounded-full"></span>
+                </div>
+              ) : (
+                stripHTML(output["6. Subject Line Options"] || "Not generated.")
+              )}
+            </div>
+          </div>
+
+          {/* GRID FOR REMAINING 5 CARDS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            {CARD_TITLES.filter((t) => t !== "6. Subject Line Options").map(
+              (title) => (
+                <div
+                  key={title}
+                  className="bg-white rounded-xl p-5 shadow-lg border flex flex-col"
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <h2 className="font-semibold text-lg">{title}</h2>
+
+                    <button
+                      disabled={loading}
+                      onClick={() => copyText(output[title] || "")}
+                      className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-100 disabled:opacity-40"
+                    >
+                      Copy
+                    </button>
+                  </div>
+
+                  <div className="flex-1 max-h-[250px] overflow-auto whitespace-pre-line text-sm leading-relaxed">
+                    {loading ? (
+                      <div className="flex justify-center items-center h-full py-6">
+                        <span className="animate-spin h-6 w-6 border-2 border-gray-400 border-t-transparent rounded-full"></span>
+                      </div>
+                    ) : (
+                      stripHTML(output[title] || "Not generated.")
+                    )}
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </>
       )}
     </div>
   );
