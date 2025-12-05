@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_URL = "https://groq-email-backend.onrender.com";
+const API_URL = "https://groq-email-backend.onrender.com/generate-emails";
 
 const CARD_TITLES = [
   "1. Friendly Email",
